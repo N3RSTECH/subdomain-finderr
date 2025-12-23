@@ -41,6 +41,6 @@ Segala penyalahgunaan di luar izin pemilik domain bukan merupakan tanggung jawab
 
 ## 👤 Author
 **v3lnør**  
-
+**R3NSS**
 ---
  Jika project ini bermanfaat, silakan beri star pada repository ini
