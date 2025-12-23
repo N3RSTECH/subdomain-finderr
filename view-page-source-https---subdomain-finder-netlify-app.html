@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Subdomain Finder
+    </title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/particles.js">
+    </script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: &#39;Inter&#39;, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    header {
+      z-index: 10;
+      position: relative;
+      background-color: #1e293b;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      z-index: 11;
+    }
+    .menu-toggle div {
+      width: 25px;
+      height: 3px;
+      background: white;
+      margin: 4px 0;
+    }
+    nav {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 1rem;
+      z-index: 20;
+    }
+    nav.show {
+      display: flex;
+    }
+    nav a {
+      color: #38bdf8;
+      text-decoration: none;
+      margin: 0.5rem 0;
+      z-index: 21;
+    }
+    .container {
+      z-index: 2;
+      position: relative;
+      max-width: 600px;
+      margin: 5rem auto;
+      padding: 2rem;
+      background-color: rgba(30, 41, 59, 0.85);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 10px 20px;
+      font-weight: 600;
+      background: #38bdf8;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      margin-right: 0.5rem;
+      cursor: pointer;
+    }
+    #results {
+      margin-top: 1.5rem;
+      background: #1e293b;
+      padding: 1rem;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+    footer {
+      z-index: 2;
+      position: relative;
+      text-align: center;
+      padding: 2rem;
+      background: #1e293b;
+      margin-top: 3rem;
+    }
+    .created-by {
+      color: #38bdf8;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      z-index: 30;
+      padding: 2rem;
+      overflow: auto;
+    }
+    #modal &gt; div {
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      color: white;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="particles-js">
+    </div>
+    <header>
+      <div class="logo">
+        Subdomain Finder
+      </div>
+      <div class="menu-toggle" onclick="toggleMenu()">
+        <div>
+        </div>
+        <div>
+        </div>
+        <div>
+        </div>
+      </div>
+      <nav id="menu">
+        <a href="https://t.me/R3NSSSXOR" target="_blank">        Hubungi Admin
+</a>
+        <a href="#" onclick="showModal(&#39;penjelasan&#39;)">        Penjelasan
+</a>
+        <a href="#" onclick="showModal(&#39;edukasi&#39;)">        Edukasi
+</a>
+      </nav>
+    </header>
+    <div class="container">
+      <input type="text" id="domain" placeholder="Masukkan domain, misal: cloudflare.com" />
+      <button onclick="fetchSubdomains()">
+        Cari
+      </button>
+      <button onclick="clearResults()">
+        Clear
+      </button>
+      <div id="results">
+      </div>
+    </div>
+    <footer>
+      <div class="created-by" onclick="alert(&#39;Keep hacking smart, R3NSS!&#39;)">
+        Created by R3NSS
+      </div>
+      <p>
+        Powered by crt.sh
+      </p>
+    </footer>
+    <div id="modal">
+      <div>
+        <div id="modal-content">
+        </div>
+        <button onclick="closeModal()" style="margin-top:1rem;">
+          Tutup
+        </button>
+      </div>
+    </div>
+    <script>
+      particlesJS.load(&#39;particles-js&#39;, &#39;https://cdn.jsdelivr.net/gh/VincentGarreau/particles.js/particles.json&#39;);
+
+    function toggleMenu() {
+      document.getElementById(&#39;menu&#39;).classList.toggle(&#39;show&#39;);
+    }
+
+    async function fetchSubdomains() {
+      const domain = document.getElementById(&#34;domain&#34;).value.trim();
+      const resultDiv = document.getElementById(&#34;results&#34;);
+      resultDiv.innerHTML = &#34;&lt;p&gt;Loading...&lt;/p&gt;&#34;;
+
+      try {
+        const res = await fetch(`https://crt.sh/?q=%25.${domain}&amp;output=json`);
+        const data = await res.json();
+        const subdomains = [...new Set(data.map(entry =&gt; entry.name_value))];
+        resultDiv.innerHTML = &#39;&lt;strong&gt;Subdomain ditemukan:&lt;/strong&gt;&lt;br&gt;&lt;br&gt;&#39; + subdomains.join(&#39;&lt;br&gt;&#39;);
+      } catch (err) {
+        resultDiv.innerHTML = &#39;&lt;span style=&#34;color:red&#34;&gt;Gagal mengambil data. Cek koneksi dan domain kamu.&lt;/span&gt;&#39;;
+      }
+    }
+
+    function clearResults() {
+      document.getElementById(&#34;results&#34;).innerHTML = &#34;&#34;;
+      document.getElementById(&#34;domain&#34;).value = &#34;&#34;;
+    }
+
+    function showModal(type) {
+      const modal = document.getElementById(&#39;modal&#39;);
+      const content = document.getElementById(&#39;modal-content&#39;);
+      modal.style.display = &#39;block&#39;;
+      if (type === &#39;penjelasan&#39;) {
+        content.innerHTML = `
+          &lt;h2&gt;Penjelasan Tools&lt;/h2&gt;
+          &lt;p&gt;Tools ini digunakan untuk mencari subdomain dari domain utama secara real-time menggunakan data dari crt.sh. Sangat cocok untuk kegiatan OSINT, bug hunting, dan forensik digital.&lt;/p&gt;`;
+      } else if (type === &#39;edukasi&#39;) {
+        content.innerHTML = `
+          &lt;h2&gt;Edukasi Keamanan&lt;/h2&gt;
+          &lt;p&gt;Tools ini hanya untuk edukasi dan penelitian. Segala penyalahgunaan di luar batas etis dan hukum bukan tanggung jawab developer.&lt;/p&gt;`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById(&#39;modal&#39;).style.display = &#39;none&#39;;
+    }
+    </script>
+  </body>
+</html>
